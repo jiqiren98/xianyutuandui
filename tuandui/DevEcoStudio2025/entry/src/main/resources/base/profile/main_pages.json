@@ -7,6 +7,7 @@
     "pages/Childs/personal_center",
     "pages/Childs/service_order",
     "pages/Childs/surrounding_living",
-    "pages/LXL/details"
+    "pages/LXL/details",
+    "pages/LXL/history_orders"
   ]
 }

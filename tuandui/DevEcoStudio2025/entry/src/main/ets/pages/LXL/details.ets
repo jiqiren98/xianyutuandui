@@ -2,36 +2,35 @@ import router from '@ohos.router';
 
 // 拆分用户信息子类型
 interface UserInfo {
-  channel: string;   // 下单渠道（如“小程序”）
-  phone: string;     // 用户手机号（脱敏后）
+  channel: string; // 下单渠道（如“小程序”）
+  phone: string; // 用户手机号（脱敏后）
 }
 
 // 拆分商品信息子类型
 interface ProductItem {
-  name: string;      // 商品名称
-  count: number;     // 商品数量
-  price: number;     // 商品单价
-  image: Resource;   // 商品图片资源
+  name: string; // 商品名称
+  count: number; // 商品数量
+  price: number; // 商品单价
+  image: Resource; // 商品图片资源
 }
 
 // 主订单信息接口（引用拆分后的子接口）
 interface OrderInfo {
-  orderStatus: string;        // 订单状态（如“进行中”）
-  userInfo: UserInfo;         // 引用UserInfo接口
-  deliveryAddress: string;    // 配送地址
-  orderTime: string;          // 下单时间
-  orderRemark: string;        // 订单备注
-  products: ProductItem[];    // 引用ProductItem接口的数组
-  totalDiscount: number;      // 优惠金额
-  totalAmount: number;        // 合计金额
-  cancelBtnVisible: boolean;  // 是否显示“取消订单”按钮
+  orderStatus: string; // 订单状态（如“进行中”）
+  userInfo: UserInfo; // 引用UserInfo接口
+  deliveryAddress: string; // 配送地址
+  orderTime: string; // 下单时间
+  orderRemark: string; // 订单备注
+  products: ProductItem[]; // 引用ProductItem接口的数组
+  totalDiscount: number; // 优惠金额
+  totalAmount: number; // 合计金额
+  cancelBtnVisible: boolean; // 是否显示“取消订单”按钮
 }
 
 @Entry
 @Component
 struct DetailsPage {
   @State isCollected: boolean = false;
-
   // 模拟订单数据源
   private orderInfo: OrderInfo = {
     orderStatus: '进行中',
@@ -72,7 +71,7 @@ struct DetailsPage {
         .fontColor('#ff5000')
         .fontWeight(FontWeight.Bold)
         .margin({ left: 8 });
-    }
+    }.margin('5px')
   }
 
   @Builder
@@ -89,14 +88,14 @@ struct DetailsPage {
       }
 
       Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
-        Stack(){
+        Stack() {
           Text('配送地址')
             .fontSize(16)
             .fontColor('#333')
             .layoutWeight(1);
         }.width('20%')
 
-        Stack(){
+        Stack() {
           Text(this.orderInfo.deliveryAddress)
             .fontSize(16)
             .fontColor('#666')
@@ -136,7 +135,7 @@ struct DetailsPage {
         .fontWeight(FontWeight.Medium)
         .fontColor('#333');
 
-      ForEach(this.orderInfo.products, (product:ProductItem) => {
+      ForEach(this.orderInfo.products, (product: ProductItem) => {
         Row({ space: 12 }) {
           Image(product.image)
             .width(60)
@@ -218,26 +217,28 @@ struct DetailsPage {
     Column() {
       // 顶部导航栏
       Row() {
-        Button('<').onClick(()=>{
-          router.back()
-        })
-        Text('订单详情')
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .layoutWeight(1)
-          .textAlign(TextAlign.Center);
+        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }){
+          Stack() {
+            Text('<').onClick(() => {
+              router.back()
+            })
+              .fontColor('#ffffffff')
+          }.width('10%')
+          Stack(){
+            Text('订单详情')
+              .fontSize(20)
+              .fontWeight(FontWeight.Bold)
+              .layoutWeight(1)
+              .textAlign(TextAlign.Center)
+              .fontColor('#ffffffff')
+          }
+          Stack().width("10%")
+        }
 
-        Image(this.isCollected ? $r('app.media.icon71') : $r('app.media.icon71'))
-          .width(24)
-          .height(24)
-          .margin({ right: 12 })
-          .onClick(() => {
-            this.isCollected = !this.isCollected;
-          });
       }
       .width('100%')
       .height(56)
-      .backgroundColor(Color.White)
+      .backgroundColor('#FFA500')
       .justifyContent(FlexAlign.SpaceBetween);
 
       // 内容滚动区
@@ -245,15 +246,7 @@ struct DetailsPage {
         Column({ space: 16 }) {
           this.OrderStatusBar()
           this.UserInfoSection()
-          Divider()
-            .height(1) // 线的高度（厚度）
-            .color('#000000') // 线的颜色
-            .margin({ top: 0, bottom: 0 }) // 上下间距
           this.BottomActions()
-          Divider()
-            .height(1) // 线的高度（厚度）
-            .color('#000000') // 线的颜色
-            .margin({ top: 0, bottom: 0 }) // 上下间距
           this.AmountSummary()
           this.ProductList()
         }

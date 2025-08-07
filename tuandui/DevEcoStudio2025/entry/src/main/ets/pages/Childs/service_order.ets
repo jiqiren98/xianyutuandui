@@ -61,6 +61,30 @@ struct service_order {
 
       Column() {
         // 顶部栏
+        // 顶部导航栏
+        Row() {
+          Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }){
+            Stack() {
+              Text('')
+            }.width('10%')
+            Stack(){
+              Text('服务订单')
+                .fontSize(20)
+                .fontWeight(FontWeight.Bold)
+                .layoutWeight(1)
+                .textAlign(TextAlign.Center)
+                .fontColor('#ffffffff')
+
+            }
+            Stack().width("10%")
+          }
+
+        }
+        .width('100%')
+        .height(56)
+        .backgroundColor('#FFA500')
+        .justifyContent(FlexAlign.SpaceBetween);
+
         Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
           Row() {
             Text('进行中：')
@@ -73,9 +97,16 @@ struct service_order {
             // 替代Blank，自动填充剩余空间
             Image($r('app.media.order'))
               .width(24).height(24)
-            Text('历史订单')
-              .fontSize(16)
-              .margin({ left: 4 })
+            Stack(){
+              Text('历史订单')
+                .fontSize(16)
+                .margin({ left: 4 })
+            }.onClick(()=>{
+              router.pushUrl({
+                url:'pages/LXL/history_orders'
+              })
+            })
+
           }
 
         }
