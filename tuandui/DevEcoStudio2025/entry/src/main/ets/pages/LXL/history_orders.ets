@@ -1,4 +1,5 @@
 import router from '@ohos.router';
+import { JSON } from '@kit.ArkTS';
 
 // 定义订单数据类型
 interface OrderItem {
@@ -11,22 +12,29 @@ interface OrderItem {
 
 // 定义导航菜单项数据
 
-interface NavItems {
+@Observed
+class NavItem {
   title: string;
-  isActive: boolean
+  isActive: boolean;
+
+  constructor(title: string, isActive: boolean) {
+    this.title = title;
+    this.isActive = isActive;
+  }
 }
 
 @Entry
 @Component
 struct DetailsPage {
-  @State isCollected: boolean = false;
-  private navItems: NavItems[] = [
-    { title: '全部', isActive: false },
-    { title: '便利超市', isActive: false },
-    { title: '小区团购', isActive: true }, // 模拟当前激活项
-    { title: '蛋糕烘焙', isActive: false },
-    { title: '家政清洁', isActive: false },
-    { title: '保养干洗', isActive: false }
+  @State is_: number = 0;
+  @ObjectLink item: NavItem;
+  navItems: NavItem[] = [
+    new NavItem('全部', true),
+    new NavItem('便利超市', false),
+    new NavItem('小区团购', false),
+    new NavItem('蛋糕烘焙', false),
+    new NavItem('家政清洁', false),
+    new NavItem('保养干洗', false)
   ]
   // 模拟订单数据源，实际可从接口请求
   @State orderList: OrderItem[] = [
@@ -105,17 +113,15 @@ struct DetailsPage {
         //左侧菜单
         Stack() {
           Column({ space: 10 }) {
-            ForEach(this.navItems, (item:NavItems) => {
+            ForEach(this.navItems, (i:NavItem,index:number) => {
               Row() {
-                Text(item.title)
+                Text(i.title)
                   .fontSize(14)
-                  .fontColor(item.isActive ? '#FFA500' : '#333333')  // 激活项橙色高亮
+                  .fontColor( this.is_ === index ? '#FFA500' : '#333333')  // 激活项橙色高亮
                   .padding(10)
-                  .backgroundColor(item.isActive ? '#F5F5F5' : '#FFFFFF')  // 激活项背景区分
+                  .backgroundColor(this.is_ === index ? '#F5F5F5' : '#FFFFFF')  // 激活项背景区分
                   .onClick(() => {
-                    // 处理导航点击逻辑，可结合router跳转或状态管理
-                    this.navItems.forEach(i => i.isActive = false);
-                    item.isActive = true;
+                    this.is_ = index
                   })
               }
               .width('100%')

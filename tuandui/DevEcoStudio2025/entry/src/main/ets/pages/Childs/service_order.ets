@@ -101,13 +101,12 @@ struct service_order {
               Text('历史订单')
                 .fontSize(16)
                 .margin({ left: 4 })
-            }.onClick(()=>{
-              router.pushUrl({
-                url:'pages/LXL/history_orders'
-              })
+            }
+          }.onClick(()=>{
+            router.pushUrl({
+              url:'pages/LXL/history_orders'
             })
-
-          }
+          })
 
         }
         .padding({
