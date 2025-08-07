@@ -10,6 +10,7 @@ const server = http.createServer(app);
 
 
 var list = require('./routes/SS/list')
+var ljlList = require('./routes/LJL/list')
 
 var app = express();
 var cors = require( 'cors' );
@@ -29,6 +30,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'routes', 'uploads')));
 
 
 app.use('/list', list)
+app.use('/ljl', ljlList)
 // app.use('/renlian', renlianRouter);
 
 // catch 404 and forward to error handler
