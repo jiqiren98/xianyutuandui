@@ -34,9 +34,25 @@ const propertySheam = new mongoose.Schema({
 
 })
 const propertyModule = mongoose.model('property',propertySheam,'property')
+const username = new mongoose.Schema({
+   username:String,
+   password:String,
+   kajuan:String,
+    name:String,
+    stock:String,
+    vip:String,
+    jifen:String,
+    dizhi:String,
+    mani:String
+
+
+})
+const user = mongoose.model('user',username,'user')
 
 
 module.exports = {
     DatesModule,
-    MessageModule
+    MessageModule,
+    user,
+    propertyModule
 }
