@@ -8,6 +8,7 @@ interface UserInfo {
 
 // 拆分商品信息子类型
 interface ProductItem {
+  _id:string;
   name: string; // 商品名称
   count: number; // 商品数量
   price: number; // 商品单价
@@ -16,14 +17,15 @@ interface ProductItem {
 
 // 主订单信息接口（引用拆分后的子接口）
 interface OrderInfo {
-  orderStatus: string; // 订单状态（如“进行中”）
-  userInfo: UserInfo; // 引用UserInfo接口
+  _id:string;
+  status:'进行中' | '已完成' | '已取消' | '待支付' | '已退款';
+  userInfo: string; // 引用UserInfo接口
   deliveryAddress: string; // 配送地址
   orderTime: string; // 下单时间
   orderRemark: string; // 订单备注
   products: ProductItem[]; // 引用ProductItem接口的数组
-  totalDiscount: number; // 优惠金额
-  totalAmount: number; // 合计金额
+  totalCount: number; // 总数
+  totalPrice: number; // 合计金额
   cancelBtnVisible: boolean; // 是否显示“取消订单”按钮
 }
 
@@ -31,58 +33,60 @@ interface OrderInfo {
 @Component
 struct DetailsPage {
   @State isCollected: boolean = false;
+  @State cardId :number =0 ;
+  aboutToAppear() {
+    const params = router.getParams() as Record<string, number|OrderInfo>;
+    if (params?.cardId !== undefined) {
+      this.cardId = params.cardId as number;
+    }
+    if (params?.item !==undefined){
+      this.orderInfo = params.item as OrderInfo
+    }
+  }
   // 模拟订单数据源
   private orderInfo: OrderInfo = {
-    orderStatus: '进行中',
-    userInfo: {
-      channel: '小程序',
-      phone: '138****0000',
-    },
+    _id:'1110',
+    status: '进行中',
+    userInfo: '',
     deliveryAddress: '武汉市江汉区汉江大道166号鹏利广场1单元2栋304',
     orderTime: '2019年12月23日 17:18',
     orderRemark: '无',
-    products: [
-      {
-        name: '可口可乐含糖可乐888ml瓶',
-        count: 1,
-        price: 5.00,
-        image: $r('app.media.icon03'), // 替换为实际图片资源
-      },
-      {
-        name: '景田百岁山570ml瓶',
-        count: 1,
-        price: 3.00,
-        image: $r('app.media.icon03'), // 替换为实际图片资源
-      },
-    ],
-    totalDiscount: 1.00,
-    totalAmount: 8.00,
+    products: [],
+    totalCount: 1,
+    totalPrice: 8.00,
     cancelBtnVisible: true,
   };
 
   @Builder
   OrderStatusBar() {
-    Row() {
-      Text('订单状态')
-        .fontSize(16)
-        .fontColor('#333');
-      Text(this.orderInfo.orderStatus)
-        .fontSize(16)
-        .fontColor('#ff5000')
-        .fontWeight(FontWeight.Bold)
-        .margin({ left: 8 });
-    }.margin('5px')
+    Column(){
+      Row() {
+        Text('订单状态')
+          .fontSize(16)
+          .fontColor('#ff000000');
+        Text(this.orderInfo.status)
+          .fontSize(16)
+          .fontColor(this.orderInfo.status === '已完成' ? '#00CC00' : '#FF0000')
+          .fontWeight(FontWeight.Bold)
+          .margin({ left: 8 });
+      }
+    }
+    .width('100%')
+    .height(56)
+    .backgroundColor('#ffffffff')
+    .margin({top:8,bottom:8})
+    .justifyContent(FlexAlign.Center);
   }
 
   @Builder
   UserInfoSection() {
     Column({ space: 8 }) {
       Row() {
-        Text('用户信息')
+        Text('订单编号:')
           .fontSize(16)
           .fontColor('#333')
           .layoutWeight(1);
-        Text(`${this.orderInfo.userInfo.channel}  ${this.orderInfo.userInfo.phone}`)
+        Text(`${this.orderInfo._id} `)
           .fontSize(16)
           .fontColor('#666');
       }
@@ -92,7 +96,6 @@ struct DetailsPage {
           Text('配送地址')
             .fontSize(16)
             .fontColor('#333')
-            .layoutWeight(1);
         }.width('20%')
 
         Stack() {
@@ -103,7 +106,7 @@ struct DetailsPage {
             .textOverflow({ overflow: TextOverflow.Ellipsis });
         }.width('60%')
 
-      }
+      }.width('100%')
 
       Row() {
         Text('下单时间')
@@ -124,6 +127,10 @@ struct DetailsPage {
           .fontSize(16)
           .fontColor('#666');
       }
+      .width('100%')
+      .height(56)
+      .margin({top:8,bottom:8})
+
     }
   }
 
@@ -136,19 +143,24 @@ struct DetailsPage {
         .fontColor('#333');
 
       ForEach(this.orderInfo.products, (product: ProductItem) => {
-        Row({ space: 12 }) {
-          Image(product.image)
-            .width(60)
-            .height(60)
-            .objectFit(ImageFit.Contain);
+        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween, alignItems: ItemAlign.Center }) {
+          Stack() {
+            Image($r('app.media.icon404'))
+              .width(60)
+              .height(60)
+              .objectFit(ImageFit.Contain);
+          }.width('20%')
+
           Column({ space: 4 }) {
             Text(product.name)
               .fontSize(16)
-              .fontColor('#333');
+              .fontColor('#ff000000')
+              .width('100%')
             Text(`共${product.count}件  小计 ¥${product.price.toFixed(2)}`)
               .fontSize(14)
-              .fontColor('#666');
-          }
+              .fontColor('#666')
+              .width('100%')
+          }.width('75%')
         }
       })
     }
@@ -162,10 +174,10 @@ struct DetailsPage {
           .fontSize(16)
           .fontColor('#333')
           .layoutWeight(1);
-        Text(`优惠 ¥${this.orderInfo.totalDiscount.toFixed(2)}`)
+        Text(`优惠 ¥${this.orderInfo.totalCount}`)
           .fontSize(16)
           .fontColor('#ff5000');
-        Text(`合计 ¥${this.orderInfo.totalAmount.toFixed(2)}`)
+        Text(`合计 ¥${this.orderInfo.totalPrice.toFixed(2)}`)
           .fontSize(16)
           .fontColor('#ff5000')
           .fontWeight(FontWeight.Bold);
@@ -177,39 +189,9 @@ struct DetailsPage {
   BottomActions() {
     Column({ space: 8 }) {
       Text('便利商品支付后正常20分钟内送达，请保持手机畅通！\n便利超市订单支付后3分钟内可以取消订单')
-        .fontSize(14)
+        .fontSize(12)
         .fontColor('#666')
         .lineHeight(20);
-
-      Row() {
-        Text('如有特殊情况请联系管家')
-          .fontSize(14)
-          .fontColor('#666')
-          .layoutWeight(1);
-        if (this.orderInfo.cancelBtnVisible) {
-          Button('取消订单')
-            .width(100)
-            .height(32)
-            .fontSize(14)
-            .backgroundColor('#ff5000')
-            .fontColor(Color.White)
-            .borderRadius(4)
-            .onClick(() => {
-              console.log('取消订单');
-            });
-        }
-        Button('拨打管家电话')
-          .width(120)
-          .height(32)
-          .fontSize(14)
-          .backgroundColor('#f5f5f5')
-          .fontColor('#333')
-          .border({ width: 1, color: '#ddd' })
-          .borderRadius(4)
-          .onClick(() => {
-            console.log('拨打电话');
-          });
-      }
     }
   }
 
@@ -217,14 +199,15 @@ struct DetailsPage {
     Column() {
       // 顶部导航栏
       Row() {
-        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }){
+        Flex({ direction: FlexDirection.Row, justifyContent: FlexAlign.SpaceBetween }) {
           Stack() {
             Text('<').onClick(() => {
               router.back()
             })
               .fontColor('#ffffffff')
           }.width('10%')
-          Stack(){
+
+          Stack() {
             Text('订单详情')
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
@@ -232,6 +215,7 @@ struct DetailsPage {
               .textAlign(TextAlign.Center)
               .fontColor('#ffffffff')
           }
+
           Stack().width("10%")
         }
 
@@ -241,19 +225,13 @@ struct DetailsPage {
       .backgroundColor('#FFA500')
       .justifyContent(FlexAlign.SpaceBetween);
 
-      // 内容滚动区
-      Scroll() {
-        Column({ space: 16 }) {
-          this.OrderStatusBar()
-          this.UserInfoSection()
-          this.BottomActions()
-          this.AmountSummary()
-          this.ProductList()
-        }
-        .padding(16)
+      Column() {
+        this.OrderStatusBar()
+        this.UserInfoSection()
+        this.BottomActions()
+        this.AmountSummary()
+        this.ProductList()
       }
-      .scrollable(ScrollDirection.Vertical)
-      .layoutWeight(1);
 
       // 底部操作栏
       Row() {

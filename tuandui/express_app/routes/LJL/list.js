@@ -1,29 +1,25 @@
 var express = require('express');
 var router = express.Router();
-const {user} = require('../databases/date')
+const {user} = require('../../databases/date.js')
 /* GET users listing. */
 router.post('/login',async function(req, res, next) {
   try {
     const { username, password } = req.body;
-    
     // 根据用户名查找用户
     const findUser = await user.findOne({ username });
-    
     if (!findUser) {
       return res.send({
-        code: "400",
+        code: "202",
         message: "用户不存在"
       });
     }
-    
     // 验证密码
     if (findUser.password !== password) {
       return res.send({
-        code: "400",
+        code: "201",
         message: "密码错误"
       });
     }
-    
     // 登录成功
     res.send({
       code: "200",
@@ -31,8 +27,14 @@ router.post('/login',async function(req, res, next) {
       data: {
         username: findUser.username,
         name: findUser.name,
-        // 可以根据需要返回其他用户信息
-      }
+        _id: findUser._id,
+        password: findUser.password,
+        dizhi: findUser.dizhi,
+        kajuan: findUser.kajuan,
+        mani: findUser.mani,
+        jifen:findUser.jifen,
+        vip:findUser.vip,
+        stock:findUser.stock,}
     });
   } catch (error) {
     res.send({

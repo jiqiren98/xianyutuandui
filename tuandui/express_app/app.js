@@ -31,6 +31,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'routes', 'uploads')));
 
 app.use('/list', list)
 app.use('/ljl', ljlList)
+app.use('/lxl', require('./routes/LXL/list'))
 // app.use('/renlian', renlianRouter);
 
 // catch 404 and forward to error handler
