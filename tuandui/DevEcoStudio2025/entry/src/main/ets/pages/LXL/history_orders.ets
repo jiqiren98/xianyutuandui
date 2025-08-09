@@ -140,6 +140,28 @@ struct DetailsPage {
       }
     }
   }
+  time_filter (isoTime:string){
+    const date = new Date(isoTime);
+
+    // 转换为北京时间（UTC+8）
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1; // 月份从 0 开始，需 +1
+    let day = date.getUTCDate();
+    let hours = date.getUTCHours() + 8; // 北京时间 = UTC 时间 + 8 小时
+
+    // 处理跨天情况（如 UTC 23:00 +8 = 次日 07:00）
+    if (hours >= 24) {
+      hours -= 24;
+      day += 1; // 需额外处理月份天数，简化场景可省略
+    }
+
+    // 补零格式化（如 1 → "01"）
+    const formatNumber = (num: number) => num.toString().padStart(2, '0');
+
+    const beijingTime = `${year}-${formatNumber(month)}-${formatNumber(day)} ${formatNumber(hours)}:${formatNumber(date.getUTCMinutes())}`;
+    console.log('北京时间：', beijingTime); // 输出：2024-08-08 17:30
+    return beijingTime
+  }
 
   build() {
     Column() {
@@ -215,7 +237,7 @@ struct DetailsPage {
                       .padding({ bottom: 5 })
 
                       Row() {
-                        Text(`下单时间：${item.orderTime}`)
+                        Text(`下单时间：${this.time_filter(item.orderTime)}`)
                           .fontSize(12)
                           .fontColor('#999999')
                       }

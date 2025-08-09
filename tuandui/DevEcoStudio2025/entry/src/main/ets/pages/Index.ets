@@ -4,13 +4,13 @@ import personal from './Childs/personal_center' // 周边生活
 import service from './Childs/service_order'  // 服务订单
 import surrounding from './Childs/surrounding_living'  // 个人中心
 import Index_home from './Childs/Index_home' // 首页
-
 @Entry
 @Component
 struct Index {
   @State currentIndex: number = 2;
   private tabsController: TabsController = new TabsController();
   @State service_totalCount: number = 0;
+  private childRef: service | null = null;
   @Builder TabBuilder(index: number, selectedICon: Resource,unselectIcon:Resource ,text?: string,iconSize: number = 24) {
     Column() {
       Image(this.currentIndex==index?unselectIcon:selectedICon)
@@ -70,7 +70,11 @@ struct Index {
     .barHeight(60)    // 设置TabBar高度
     .onChange((index: number) => {
       this.currentIndex = index;
-      // this.tabsController.changeIndex(index)
+      console.log(`${index}`)
+      if (this.childRef) {
+        // 调用子组件的 public 方法
+        this.childRef.refreshOrders();
+      }
     })
     .width('100%')
     .height('100%')

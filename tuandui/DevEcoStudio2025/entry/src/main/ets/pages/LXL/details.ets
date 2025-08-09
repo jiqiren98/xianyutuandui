@@ -43,6 +43,40 @@ struct DetailsPage {
       this.orderInfo = params.item as OrderInfo
     }
   }
+  //是否可以取消订单
+  canCancelOrder(orderTime: string): boolean {
+    const createTime = new Date(orderTime).getTime(); // 订单创建时间（毫秒）
+    const currentTime = new Date().getTime(); // 当前时间（毫秒）
+    const diffMinutes = (currentTime - createTime) / (1000 * 60); // 时间差（分钟）
+    return diffMinutes > 3; // 超过3分钟返回true（允许取消）
+  }
+
+
+  //时间过滤器
+
+
+  time_filter (isoTime:string){
+    const date = new Date(isoTime);
+
+    // 转换为北京时间（UTC+8）
+    const year = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1; // 月份从 0 开始，需 +1
+    let day = date.getUTCDate();
+    let hours = date.getUTCHours() + 8; // 北京时间 = UTC 时间 + 8 小时
+
+    // 处理跨天情况（如 UTC 23:00 +8 = 次日 07:00）
+    if (hours >= 24) {
+      hours -= 24;
+      day += 1; // 需额外处理月份天数，简化场景可省略
+    }
+
+    // 补零格式化（如 1 → "01"）
+    const formatNumber = (num: number) => num.toString().padStart(2, '0');
+
+    const beijingTime = `${year}-${formatNumber(month)}-${formatNumber(day)} ${formatNumber(hours)}:${formatNumber(date.getUTCMinutes())}`;
+    console.log('北京时间：', beijingTime); // 输出：2024-08-08 17:30
+    return beijingTime
+  }
   // 模拟订单数据源
   private orderInfo: OrderInfo = {
     _id:'1110',
@@ -113,7 +147,7 @@ struct DetailsPage {
           .fontSize(16)
           .fontColor('#333')
           .layoutWeight(1);
-        Text(this.orderInfo.orderTime)
+        Text(this.time_filter(this.orderInfo.orderTime))
           .fontSize(16)
           .fontColor('#666');
       }
@@ -193,6 +227,7 @@ struct DetailsPage {
         .fontColor('#666')
         .lineHeight(20);
     }
+    .margin({top:50,bottom:50})
   }
 
   build() {
@@ -235,11 +270,18 @@ struct DetailsPage {
 
       // 底部操作栏
       Row() {
-        Button('查看物流')
-          .width('45%')
-          .height(40)
-          .backgroundColor('#ff5000')
-          .fontColor(Color.White);
+        if(!this.canCancelOrder(this.orderInfo.orderTime)){
+          Button('取消订单')
+            .width('45%')
+            .height(40)
+            .backgroundColor('#ff5000')
+            .fontColor(Color.White)
+            .onClick(()=>{
+
+            })
+        }else {
+          Text()
+        }
 
         Button('联系商家')
           .width('45%')
